@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hierarchical App Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <h1>Hierarchical App Generator</h1>
+            <div id="breadcrumb-trail"></div>
+        </header>
+
+        <!-- Toolbar -->
+        <div id="toolbar">
+            <button id="btn-back" title="Go up one level" disabled>← Back</button>
+            <button id="btn-add-node" title="Add new node">+ Add Node</button>
+            <button id="btn-add-connection" title="Add connection">🔗 Connect</button>
+            <button id="btn-save" title="Save to LocalStorage">💾 Save</button>
+            <button id="btn-load" title="Load from LocalStorage">📂 Load</button>
+            <button id="btn-export" title="Export JSON">📤 Export</button>
+            <button id="btn-reset-view" title="Reset zoom/pan">🎯 Reset View</button>
+            <div class="toolbar-spacer"></div>
+            <span id="zoom-level">100%</span>
+        </div>
+
+        <!-- Canvas Container -->
+        <div id="canvas-container">
+            <canvas id="main-canvas"></canvas>
+        </div>
+
+        <!-- Side Panel -->
+        <div id="side-panel" class="hidden">
+            <div id="panel-header">
+                <h3 id="panel-title">Node Details</h3>
+                <button id="btn-close-panel">✕</button>
+            </div>
+            <div id="panel-content">
+                <!-- Dynamic content based on node type -->
+            </div>
+        </div>
+
+        <!-- Modal for Node Creation -->
+        <div id="modal-overlay" class="hidden">
+            <div id="modal-content">
+                <h3 id="modal-title">Create New Node</h3>
+                <div id="modal-body">
+                    <label for="node-name-input">Node Name:</label>
+                    <input type="text" id="node-name-input" placeholder="Enter node name">
+
+                    <label for="node-type-select">Node Type:</label>
+                    <select id="node-type-select">
+                        <option value="domain">Domain</option>
+                        <option value="process">Process</option>
+                        <option value="logic">Logic</option>
+                        <option value="code">Code</option>
+                    </select>
+
+                    <div id="ai-generate-section">
+                        <label>
+                            <input type="checkbox" id="ai-generate-checkbox">
+                            Auto-generate child nodes using AI
+                        </label>
+                        <input type="text" id="ai-context-input" placeholder="Additional context for AI (optional)" disabled>
+                    </div>
+                </div>
+                <div id="modal-actions">
+                    <button id="btn-modal-cancel">Cancel</button>
+                    <button id="btn-modal-confirm">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="canvas-engine.js"></script>
+    <script src="node-system.js"></script>
+    <script src="connection-system.js"></script>
+    <script src="claude-integration.js"></script>
+    <script src="code-editor.js"></script>
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
