@@ -2,6 +2,22 @@
 
 A visual, hierarchical web application generator that allows you to design applications from high-level domain concepts down to executable code.
 
+## 🚀 Quick Start
+
+**IMPORTANT:** To use AI features, you need to run the Node.js server:
+
+```bash
+# Install dependencies
+npm install
+
+# Start the server
+npm start
+
+# Open browser to http://localhost:3000
+```
+
+📖 **Detailed setup instructions:** See [SETUP.md](SETUP.md)
+
 ## Overview
 
 This tool provides a unique approach to application design through progressive refinement:

@@ -7,6 +7,8 @@ class ClaudeIntegration {
     constructor() {
         this.apiKey = null;
         this.apiEndpoint = 'https://api.anthropic.com/v1/messages';
+        this.proxyEndpoint = '/api/claude'; // Local proxy endpoint
+        this.useProxy = true; // Use proxy by default to avoid CORS
         this.model = 'claude-3-5-sonnet-20241022';
     }
 
@@ -44,26 +46,58 @@ class ClaudeIntegration {
         const prompt = this.buildPrompt(parentNode, additionalContext);
 
         try {
-            const response = await fetch(this.apiEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': this.apiKey,
-                    'anthropic-version': '2023-06-01'
-                },
-                body: JSON.stringify({
-                    model: this.model,
-                    max_tokens: 1024,
-                    messages: [{
-                        role: 'user',
-                        content: prompt
-                    }]
-                })
-            });
+            let response;
+
+            if (this.useProxy) {
+                // Use local proxy to avoid CORS issues
+                response = await fetch(this.proxyEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apiKey: this.apiKey,
+                        model: this.model,
+                        max_tokens: 1024,
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }]
+                    })
+                });
+            } else {
+                // Direct API call (will fail in browser due to CORS)
+                response = await fetch(this.apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': this.apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: this.model,
+                        max_tokens: 1024,
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }]
+                    })
+                });
+            }
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || 'API request failed');
+                const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+
+                // Provide helpful error messages
+                if (response.status === 404) {
+                    throw new Error('Proxy server not running. Please start the server with: npm start');
+                } else if (response.status === 401) {
+                    throw new Error('Invalid API key. Please check your Claude API key.');
+                } else if (response.status === 429) {
+                    throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+                } else {
+                    throw new Error(error.error?.message || `API request failed (${response.status})`);
+                }
             }
 
             const data = await response.json();
@@ -73,6 +107,12 @@ class ClaudeIntegration {
 
         } catch (error) {
             console.error('Claude API error:', error);
+
+            // Provide more specific error messages
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                throw new Error('Cannot connect to server. Make sure to run: npm start');
+            }
+
             throw error;
         }
     }
